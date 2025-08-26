@@ -1,0 +1,187 @@
+{
+  "name": "POE2 Reddit Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "value": 30
+            }
+          ]
+        }
+      },
+      "id": "schedule-reddit-check",
+      "name": "매 30분마다 실행",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.reddit.com/r/PathOfExile2/hot.json?limit=10",
+        "options": {
+          "headers": {
+            "User-Agent": "POE2-Korean-Guide/1.0"
+          }
+        }
+      },
+      "id": "fetch-reddit-data",
+      "name": "Reddit 핫 포스트 가져오기",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const posts = items[0].json.data.children;\nconst filteredPosts = [];\n\nfor (const post of posts) {\n  const data = post.data;\n  \n  // 한국 관련 키워드나 가이드 관련 포스트 필터링\n  const keywords = ['guide', 'build', 'beginner', 'tips', 'korean', 'kr'];\n  const title = data.title.toLowerCase();\n  const selftext = (data.selftext || '').toLowerCase();\n  \n  const hasKeyword = keywords.some(keyword => \n    title.includes(keyword) || selftext.includes(keyword)\n  );\n  \n  if (hasKeyword && data.score > 10) {\n    filteredPosts.push({\n      title: data.title,\n      url: `https://reddit.com${data.permalink}`,\n      score: data.score,\n      author: data.author,\n      created: new Date(data.created_utc * 1000).toISOString(),\n      subreddit: data.subreddit,\n      num_comments: data.num_comments,\n      selftext: data.selftext || '',\n      flair: data.link_flair_text || ''\n    });\n  }\n}\n\nreturn filteredPosts.map(post => ({ json: post }));"
+      },
+      "id": "filter-posts",
+      "name": "가이드 관련 포스트 필터링",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-posts",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-has-posts",
+      "name": "새 포스트가 있는지 확인",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:3000/api/workflow-logs",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"workflowName\": \"POE2 Reddit Monitor\",\n  \"status\": \"success\",\n  \"message\": \"새로운 가이드 포스트 발견: {{ $json.title }}\",\n  \"data\": {\n    \"posts\": {{ $json }}\n  }\n}",
+        "options": {}
+      },
+      "id": "log-to-database",
+      "name": "데이터베이스에 로그 저장",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:3000/api/sites",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $json.title }}\",\n  \"url\": \"{{ $json.url }}\",\n  \"description\": \"Reddit 가이드: {{ $json.selftext.substring(0, 200) }}...\",\n  \"category\": \"GUIDE\",\n  \"korean\": false,\n  \"featured\": false,\n  \"tags\": [\"reddit\", \"guide\", \"{{ $json.flair }}\".toLowerCase()]\n}",
+        "options": {}
+      },
+      "id": "add-to-sites",
+      "name": "사이트 목록에 추가",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "매 30분마다 실행": {
+      "main": [
+        [
+          {
+            "node": "Reddit 핫 포스트 가져오기",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reddit 핫 포스트 가져오기": {
+      "main": [
+        [
+          {
+            "node": "가이드 관련 포스트 필터링",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "가이드 관련 포스트 필터링": {
+      "main": [
+        [
+          {
+            "node": "새 포스트가 있는지 확인",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "새 포스트가 있는지 확인": {
+      "main": [
+        [
+          {
+            "node": "데이터베이스에 로그 저장",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "사이트 목록에 추가",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-01-15T12:00:00.000Z",
+  "updatedAt": "2024-01-15T12:00:00.000Z",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["poe2", "reddit", "monitoring"],
+  "triggerCount": 0,
+  "versionId": "1"
+}

@@ -1,0 +1,183 @@
+{
+  "name": "POE2 YouTube Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "value": 60
+            }
+          ]
+        }
+      },
+      "id": "schedule-youtube-check",
+      "name": "매 1시간마다 실행",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://www.googleapis.com/youtube/v3/search?part=snippet&q=POE2+Path+of+Exile+2+guide+build+한국어&type=video&publishedAfter={{ $now.minus({hours: 1}).toISO() }}&order=relevance&maxResults=10&key={{ $env.YOUTUBE_API_KEY }}",
+        "options": {
+          "headers": {
+            "User-Agent": "POE2-Korean-Guide/1.0"
+          }
+        }
+      },
+      "id": "fetch-youtube-videos",
+      "name": "YouTube 최신 비디오 검색",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        460,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const videos = items[0].json.items || [];\nconst filteredVideos = [];\n\nfor (const video of videos) {\n  const snippet = video.snippet;\n  const title = snippet.title.toLowerCase();\n  const description = (snippet.description || '').toLowerCase();\n  \n  // POE2 관련 키워드 확인\n  const poe2Keywords = ['poe2', 'path of exile 2', '패스 오브 엑자일 2'];\n  const guideKeywords = ['guide', 'build', 'tutorial', '가이드', '빌드', '공략'];\n  \n  const hasPOE2 = poe2Keywords.some(keyword => \n    title.includes(keyword) || description.includes(keyword)\n  );\n  \n  const hasGuide = guideKeywords.some(keyword => \n    title.includes(keyword) || description.includes(keyword)\n  );\n  \n  if (hasPOE2 && hasGuide) {\n    filteredVideos.push({\n      title: snippet.title,\n      videoId: video.id.videoId,\n      url: `https://www.youtube.com/watch?v=${video.id.videoId}`,\n      channelTitle: snippet.channelTitle,\n      channelId: snippet.channelId,\n      description: snippet.description || '',\n      publishedAt: snippet.publishedAt,\n      thumbnail: snippet.thumbnails.medium?.url || snippet.thumbnails.default?.url,\n      isKorean: title.includes('한국') || title.includes('kr') || /[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(title)\n    });\n  }\n}\n\nreturn filteredVideos.map(video => ({ json: video }));"
+      },
+      "id": "filter-videos",
+      "name": "POE2 가이드 영상 필터링",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        680,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "has-videos",
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-has-videos",
+      "name": "새 비디오가 있는지 확인",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        900,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:3000/api/workflow-logs",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"workflowName\": \"POE2 YouTube Monitor\",\n  \"status\": \"success\",\n  \"message\": \"새로운 POE2 가이드 영상 발견: {{ $json.title }}\",\n  \"data\": {\n    \"video\": {{ $json }}\n  }\n}",
+        "options": {}
+      },
+      "id": "log-youtube-discovery",
+      "name": "YouTube 발견 로그",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://app:3000/api/creators",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"name\": \"{{ $json.channelTitle }}\",\n  \"channel\": \"@{{ $json.channelId }}\",\n  \"description\": \"POE2 관련 콘텐츠를 제작하는 유튜버\",\n  \"platform\": \"youtube\",\n  \"korean\": {{ $json.isKorean }},\n  \"featured\": false\n}",
+        "options": {}
+      },
+      "id": "add-creator",
+      "name": "크리에이터 목록에 추가",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1120,
+        400
+      ]
+    }
+  ],
+  "connections": {
+    "매 1시간마다 실행": {
+      "main": [
+        [
+          {
+            "node": "YouTube 최신 비디오 검색",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube 최신 비디오 검색": {
+      "main": [
+        [
+          {
+            "node": "POE2 가이드 영상 필터링",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "POE2 가이드 영상 필터링": {
+      "main": [
+        [
+          {
+            "node": "새 비디오가 있는지 확인",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "새 비디오가 있는지 확인": {
+      "main": [
+        [
+          {
+            "node": "YouTube 발견 로그",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "크리에이터 목록에 추가",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "createdAt": "2024-01-15T12:00:00.000Z",
+  "updatedAt": "2024-01-15T12:00:00.000Z",
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": ["poe2", "youtube", "monitoring"],
+  "triggerCount": 0,
+  "versionId": "1"
+}

@@ -1,0 +1,177 @@
+// Prisma Schema - POE2 한국어 앱 데이터베이스
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 사이트 카테고리 enum
+enum SiteCategory {
+  DATABASE
+  GUIDE  
+  TOOL
+  ECONOMY
+  COMMUNITY
+  CREATIVE
+}
+
+// 피드백 상태 enum  
+enum FeedbackStatus {
+  PENDING
+  REVIEWED
+  IMPLEMENTED
+  REJECTED
+}
+
+// 피드백 타입 enum
+enum FeedbackType {
+  BUG_REPORT
+  FEATURE_REQUEST
+  SITE_SUGGESTION
+  GENERAL
+}
+
+// POE2 관련 사이트들
+model Site {
+  id          Int          @id @default(autoincrement())
+  name        String       @db.VarChar(100)
+  url         String       @db.VarChar(500)
+  description String       @db.Text
+  category    SiteCategory
+  korean      Boolean      @default(false)
+  featured    Boolean      @default(false)
+  clickCount  Int          @default(0)
+  isActive    Boolean      @default(true)
+  tags        String[]     // 태그 배열
+  
+  // 관계
+  clicks      SiteClick[]
+  
+  // 메타데이터
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  
+  @@map("sites")
+  @@index([category, isActive])
+  @@index([featured, isActive])
+}
+
+// 한국 크리에이터/유튜버
+model Creator {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(100)
+  channel     String   @db.VarChar(200)
+  description String   @db.Text
+  platform    String   @db.VarChar(50) // youtube, twitch, etc
+  korean      Boolean  @default(true)
+  featured    Boolean  @default(false)
+  subscribers Int?     // 구독자 수 (선택적)
+  isActive    Boolean  @default(true)
+  
+  // 메타데이터
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("creators")
+  @@index([korean, isActive])
+  @@index([featured, isActive])
+}
+
+// 게임 용어 번역
+model GameTerm {
+  id        Int      @id @default(autoincrement())
+  english   String   @unique @db.VarChar(200)
+  korean    String   @db.VarChar(200)  
+  category  String   @db.VarChar(100) // stats, damage, items, etc
+  isActive  Boolean  @default(true)
+  
+  // 메타데이터
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("game_terms")
+  @@index([category, isActive])
+  @@index([english])
+}
+
+// 사용자 피드백
+model Feedback {
+  id          Int            @id @default(autoincrement())
+  type        FeedbackType
+  title       String         @db.VarChar(200)
+  content     String         @db.Text
+  email       String?        @db.VarChar(255)
+  status      FeedbackStatus @default(PENDING)
+  adminNote   String?        @db.Text
+  userAgent   String?        @db.Text
+  ipAddress   String?        @db.VarChar(45)
+  
+  // 메타데이터
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  @@map("feedbacks")
+  @@index([status, createdAt])
+  @@index([type, status])
+}
+
+// 사이트 방문 통계
+model SiteVisit {
+  id        Int      @id @default(autoincrement())
+  page      String   @db.VarChar(255)
+  userAgent String?  @db.Text
+  ipAddress String?  @db.VarChar(45)
+  referer   String?  @db.VarChar(500)
+  
+  createdAt DateTime @default(now())
+  
+  @@map("site_visits")
+  @@index([page, createdAt])
+  @@index([createdAt])
+}
+
+// 사이트 클릭 통계
+model SiteClick {
+  id     Int    @id @default(autoincrement())
+  siteId Int
+  site   Site   @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  
+  // 클릭 메타데이터
+  userAgent String?  @db.Text
+  ipAddress String?  @db.VarChar(45)
+  referer   String?  @db.VarChar(500)
+  
+  createdAt DateTime @default(now())
+  
+  @@map("site_clicks")
+  @@index([siteId, createdAt])
+}
+
+// n8n 워크플로우 로그
+model WorkflowLog {
+  id           Int      @id @default(autoincrement())
+  workflowName String   @db.VarChar(100)
+  status       String   @db.VarChar(50) // success, failed, running
+  message      String?  @db.Text
+  data         Json?    // 수집된 데이터
+  
+  createdAt    DateTime @default(now())
+  
+  @@map("workflow_logs")
+  @@index([workflowName, createdAt])
+  @@index([status, createdAt])
+}
+
+// 앱 설정
+model AppSetting {
+  id    Int    @id @default(autoincrement())
+  key   String @unique @db.VarChar(100)
+  value String @db.Text
+  
+  updatedAt DateTime @updatedAt
+  
+  @@map("app_settings")
+}

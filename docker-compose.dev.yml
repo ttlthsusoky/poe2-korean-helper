@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  # PostgreSQL 데이터베이스만 실행
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: poe2_korean_app
+      POSTGRES_USER: poe2_admin
+      POSTGRES_PASSWORD: secure_password_123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - poe2_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U poe2_admin -d poe2_korean_app"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  postgres_data:
+
+networks:
+  poe2_network:
+    driver: bridge
