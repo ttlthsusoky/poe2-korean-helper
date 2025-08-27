@@ -101,11 +101,24 @@
     "client_mode": "focus-existing"
   },
   "background_sync": {
-    "enabled": false
+    "enabled": true
   },
-  "scope_extensions": [],
+  "scope_extensions": [
+    {
+      "origin": "https://poe2-korean-helper.vercel.app"
+    }
+  ],
   "offline": {
     "enabled": true
+  },
+  "share_target": {
+    "action": "/",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
   },
   "shortcuts": [
     {
