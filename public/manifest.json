@@ -72,6 +72,23 @@
       "purpose": "maskable"
     }
   ],
+  "screenshots": [
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512", 
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "POE2 헬퍼 메인 화면"
+    },
+    {
+      "src": "/icons/icon-384x384.png",
+      "sizes": "384x384",
+      "type": "image/png", 
+      "form_factor": "narrow",
+      "label": "사이트 목록 화면"
+    }
+  ],
+  "iarc_rating_id": "e84b072d-71de-5b27-a909-9dd68db40cb3",
   "categories": ["games", "utilities", "productivity"],
   "lang": "ko-KR", 
   "dir": "ltr",
@@ -82,6 +99,13 @@
   },
   "launch_handler": {
     "client_mode": "focus-existing"
+  },
+  "background_sync": {
+    "enabled": false
+  },
+  "scope_extensions": [],
+  "offline": {
+    "enabled": true
   },
   "shortcuts": [
     {
