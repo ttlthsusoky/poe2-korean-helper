@@ -3,10 +3,20 @@ from PIL import Image, ImageDraw, ImageFont
 import io
 
 def create_poe2_icon(size):
-    """POE2 테마 아이콘 생성"""
-    # 이미지 생성
-    img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
+    """POE2 아이콘 리사이즈"""
+    # 기존 POE2 아이콘 로드
+    try:
+        base_icon = Image.open("C:/Users/hee/Desktop/ICON.jpg")
+        # RGBA 모드로 변환
+        base_icon = base_icon.convert("RGBA")
+        # 사이즈 조정
+        img = base_icon.resize((size, size), Image.Resampling.LANCZOS)
+        return img
+    except Exception as e:
+        print(f"기존 아이콘 로드 실패 ({size}): {e}, 기본 아이콘 생성")
+        # 실패시 기본 아이콘 생성
+        img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
     
     # 배경 그라디언트 원 (금색)
     center = size // 2
