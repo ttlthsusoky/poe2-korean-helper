@@ -41,8 +41,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://poe2-korean-app.vercel.app',
-    siteName: 'poe2헬퍼',
+    url: 'https://poe2-korean-helper.vercel.app',
+    siteName: 'POE2헬퍼',
     title: 'poe2헬퍼 - Path of Exile 2 커뮤니티 도구',
     description: 'PoE2 커뮤니티를 위한 유용한 사이트 모음과 한국어 번역 도구. 비공식 앱입니다.',
     images: [

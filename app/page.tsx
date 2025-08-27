@@ -41,7 +41,7 @@ export default function HomePage() {
       name: 'POE2 Ninja',
       url: 'https://poe2.ninja/',
       description: 'Currency 시세와 Build 통계, Endgame 경제 정보',
-      category: 'ECONOMY',
+      category: 'TOOL',
       korean: false,
       featured: true,
       clickCount: 2890,
@@ -126,17 +126,6 @@ export default function HomePage() {
     },
     {
       id: 10,
-      name: 'Exiled Exchange 2',
-      url: 'https://exiledexchange.com/',
-      description: '게임 내 가격 확인과 거래 보조 툴',
-      category: 'ECONOMY',
-      korean: false,
-      featured: false,
-      clickCount: 743,
-      tags: ['trading', 'prices', 'market']
-    },
-    {
-      id: 11,
       name: 'POE2Skills.com',
       url: 'https://poe2skills.com/',
       description: 'POE2 스킬 정보를 한눈에 볼 수 있는 데이터베이스',
@@ -145,17 +134,6 @@ export default function HomePage() {
       featured: false,
       clickCount: 456,
       tags: ['skills', 'database', 'reference']
-    },
-    {
-      id: 12,
-      name: 'POE2 Skill Tree Planner',
-      url: 'https://poe-2-skill-tree-planner.vercel.app/',
-      description: '패시브 스킬 트리 계획 및 시뮬레이션 도구',
-      category: 'TOOL',
-      korean: false,
-      featured: false,
-      clickCount: 334,
-      tags: ['passive', 'planning', 'tree']
     },
     {
       id: 13,
@@ -196,7 +174,6 @@ export default function HomePage() {
     { id: 'TOOL', name: '도구', icon: Zap },
     { id: 'ECONOMY', name: '경제정보', icon: TrendingUp },
     { id: 'COMMUNITY', name: '커뮤니티', icon: MessageCircle },
-    { id: 'CREATIVE', name: '창작', icon: Palette },
   ]
 
   // 데이터 로드
