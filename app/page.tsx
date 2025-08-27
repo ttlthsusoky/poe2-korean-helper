@@ -93,17 +93,6 @@ export default function HomePage() {
     },
     {
       id: 7,
-      name: 'PoEWiki',
-      url: 'https://www.poewiki.net/',
-      description: 'POE2 공식 Wiki, Skill Gem과 Support Gem 상세 정보',
-      category: 'DATABASE',
-      korean: false,
-      featured: false,
-      clickCount: 892,
-      tags: ['wiki', 'database', 'skills']
-    },
-    {
-      id: 8,
       name: 'Path of Building',
       url: 'https://pathofbuilding.community/',
       description: 'Build 계획과 DPS 계산을 위한 필수 Tool',
@@ -114,15 +103,81 @@ export default function HomePage() {
       tags: ['build', 'planning', 'calculator']
     },
     {
+      id: 8,
+      name: 'Craft of Exile',
+      url: 'https://www.craftofexile.com/',
+      description: '아이템 제작 시뮬레이터 및 가격 추정 Tool',
+      category: 'TOOL',
+      korean: false,
+      featured: true,
+      clickCount: 892,
+      tags: ['crafting', 'simulator', 'prices']
+    },
+    {
       id: 9,
-      name: 'POE2 Planner',
-      url: 'https://poe2planner.com/',
-      description: 'Passive Tree 및 Character 빌드 웹 플래너',
+      name: 'Filterblade',
+      url: 'https://filterblade.xyz/',
+      description: '아이템 필터 제작 및 관리 도구',
       category: 'TOOL',
       korean: false,
       featured: false,
-      clickCount: 543,
-      tags: ['planner', 'passive', 'build']
+      clickCount: 567,
+      tags: ['filter', 'items', 'customization']
+    },
+    {
+      id: 10,
+      name: 'Exiled Exchange 2',
+      url: 'https://exiledexchange.com/',
+      description: '게임 내 가격 확인과 거래 보조 툴',
+      category: 'ECONOMY',
+      korean: false,
+      featured: false,
+      clickCount: 743,
+      tags: ['trading', 'prices', 'market']
+    },
+    {
+      id: 11,
+      name: 'POE2Skills.com',
+      url: 'https://poe2skills.com/',
+      description: 'POE2 스킬 정보를 한눈에 볼 수 있는 데이터베이스',
+      category: 'DATABASE',
+      korean: false,
+      featured: false,
+      clickCount: 456,
+      tags: ['skills', 'database', 'reference']
+    },
+    {
+      id: 12,
+      name: 'POE2 Skill Tree Planner',
+      url: 'https://poe-2-skill-tree-planner.vercel.app/',
+      description: '패시브 스킬 트리 계획 및 시뮬레이션 도구',
+      category: 'TOOL',
+      korean: false,
+      featured: false,
+      clickCount: 334,
+      tags: ['passive', 'planning', 'tree']
+    },
+    {
+      id: 13,
+      name: 'Mobalytics POE2',
+      url: 'https://mobalytics.gg/poe2/',
+      description: '최신 POE2 빌드와 상세 가이드, 메타 분석',
+      category: 'GUIDE',
+      korean: false,
+      featured: true,
+      clickCount: 1123,
+      tags: ['builds', 'guides', 'meta']
+    },
+    {
+      id: 14,
+      name: 'POE2 공식 포럼',
+      url: 'https://www.pathofexile.com/forum',
+      description: 'Path of Exile 공식 커뮤니티 포럼',
+      category: 'COMMUNITY',
+      korean: false,
+      featured: false,
+      clickCount: 678,
+      tags: ['official', 'forum', 'community']
     }
   ];
 

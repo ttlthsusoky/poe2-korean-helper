@@ -2,10 +2,11 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'poe2헬퍼 - Path of Exile 2 커뮤니티 도구',
-  description: 'PoE2 커뮤니티를 위한 유용한 사이트 모음과 한국어 번역 도구. 비공식 앱입니다.',
-  keywords: 'PoE2, 게임 가이드, 커뮤니티, 도구, 번역, 비공식',
+  title: 'POE2헬퍼 - Path of Exile 2 가이드 및 도구',
+  description: 'Path of Exile 2 한국 커뮤니티를 위한 필수 도구 모음. 유용한 사이트 링크, 게임 용어 번역, 빌드 가이드를 제공하는 비공식 앱입니다.',
+  keywords: 'Path of Exile 2, PoE2, 게임 가이드, 빌드, 커뮤니티, 도구, 번역, 한국어, 패스 오브 엑자일',
   robots: 'index, follow',
+  category: 'Games',
   authors: [{ name: 'POE2 Korean Community' }],
   creator: 'POE2 Korean Community',
   publisher: 'POE2 Korean Community',
